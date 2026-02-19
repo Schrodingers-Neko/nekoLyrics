@@ -1,0 +1,22 @@
+{
+  "Localization": {
+    "No lyrics yet": "Nessuna lirica disponibile",
+    "Song": "Corrispondente lirica",
+    "Split": "Arcobaleno",
+    "Center": "Personalizzato",
+    "Color Mode": "Modalità colore",
+    "Double Line": "Doppia riga",
+    "Single Line": "Singola riga",
+    "Display Mode": "Modalità di visualizzazione",
+    "Text Color": "Colore del testo",
+    "Lyric Offset": "Offset temporale delle liriche",
+    "Fade Mode": "Modalità sfumata"
+  },
+  "Name": "testo",
+  "Description": "testo",
+  "Category": "testo",
+  "com.neko.nekoLyrics.sdPlugin": {
+    "Tooltip": "testo",
+    "Name": "I testi delle canzoni"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "Localization": {
+    "No lyrics yet": "Brak tekstu piosenki",
+    "Song": "Odpowiedni tekst piosenki",
+    "Split": "Tęcza",
+    "Center": "Dostosowany",
+    "Color Mode": "Tryb kolorów",
+    "Double Line": "Dwuwierszowy",
+    "Single Line": "Jednowierszowy",
+    "Display Mode": "Tryb wyświetlania",
+    "Text Color": "Kolor tekstu",
+    "Lyric Offset": "Przesunięcie czasu tekstu piosenki",
+    "Fade Mode": "Tryb gradientu"
+  },
+  "Name": "słowa",
+  "Description": "słowa",
+  "Category": "słowa",
+  "com.neko.nekoLyrics.sdPlugin": {
+    "Tooltip": "teksty",
+    "Name": "Tekst piosenki wyświetlany"
+  }
+}

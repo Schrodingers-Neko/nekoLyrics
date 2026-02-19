@@ -1,0 +1,22 @@
+{
+  "Localization": {
+    "No lyrics yet": "暫無歌詞",
+    "Song": "對應歌詞",
+    "Split": "彩虹",
+    "Center": "自訂",
+    "Color Mode": "顏色模式",
+    "Double Line": "雙行",
+    "Single Line": "單行",
+    "Display Mode": "顯示模式",
+    "Text Color": "文字顏色",
+    "Lyric Offset": "歌詞時間偏移",
+    "Fade Mode": "漸變模式"
+  },
+  "Name": "歌詞",
+  "Description": "歌詞",
+  "Category": "歌詞",
+  "com.neko.nekoLyrics.sdPlugin": {
+    "Tooltip": "歌詞",
+    "Name": "歌詞顯示"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "Localization": {
+    "No lyrics yet": "歌詞はまだありません",
+    "Song": "対応する歌詞",
+    "Split": "虹",
+    "Center": "カスタマイズ",
+    "Color Mode": "カラー モード",
+    "Double Line": "二行",
+    "Single Line": "一行",
+    "Display Mode": "表示モード",
+    "Text Color": "テキストカラー",
+    "Lyric Offset": "歌詞の時間オフセット",
+    "Fade Mode": "グラデーションモード"
+  },
+  "Name": "歌詞",
+  "Description": "歌詞",
+  "Category": "歌詞",
+  "com.neko.nekoLyrics.sdPlugin": {
+    "Tooltip": "歌詞",
+    "Name": "歌詞表示"
+  }
+}

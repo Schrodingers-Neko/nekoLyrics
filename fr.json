@@ -1,0 +1,22 @@
+{
+  "Localization": {
+    "No lyrics yet": "Pas de paroles pour l'instant",
+    "Song": "Paroles correspondantes",
+    "Split": "Arc-en-ciel",
+    "Center": "Personnalisé",
+    "Color Mode": "Mode couleur",
+    "Double Line": "Double ligne",
+    "Single Line": "ligne unique",
+    "Display Mode": "Mode affichage",
+    "Text Color": "Couleur du texte",
+    "Lyric Offset": "Décalage horaire des paroles",
+    "Fade Mode": "Mode dégradé"
+  },
+  "Name": "paroles",
+  "Description": "paroles",
+  "Category": "paroles",
+  "com.neko.nekoLyrics.sdPlugin": {
+    "Tooltip": "paroles",
+    "Name": "les paroles s'affichent"
+  }
+}

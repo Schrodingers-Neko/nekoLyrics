@@ -1,0 +1,22 @@
+{
+  "Localization": {
+    "No lyrics yet": "暂无歌词",
+    "Song": "对应歌词",
+    "Split": "彩虹",
+    "Center": "自定义",
+    "Color Mode": "颜色模式",
+    "Double Line": "双行",
+    "Single Line": "单行",
+    "Display Mode": "显示模式",
+    "Text Color": "文本颜色",
+    "Lyric Offset": "歌词时间偏移",
+    "Fade Mode": "그라데이션 모드"
+  },
+  "Name": "가사",
+  "Description": "가사",
+  "Category": "가사",
+  "com.neko.nekoLyrics.sdPlugin": {
+    "Tooltip": "가사",
+    "Name": "가사 표시"
+  }
+}

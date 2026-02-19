@@ -1,0 +1,22 @@
+{
+  "Localization": {
+    "No lyrics yet": "Нет текста песни",
+    "Song": "Соответствующий текст песни",
+    "Split": "Радуга",
+    "Center": "Пользовательский",
+    "Color Mode": "Цветовая схема",
+    "Double Line": "Двойной ряд",
+    "Single Line": "Один ряд",
+    "Display Mode": "Режим отображения",
+    "Text Color": "Цвет текста",
+    "Lyric Offset": "Смещение времени текста песни",
+    "Fade Mode": "Режим градиента"
+  },
+  "Name": "текст песни",
+  "Description": "текст песни",
+  "Category": "текст песни",
+  "com.neko.nekoLyrics.sdPlugin": {
+    "Tooltip": "текст песни",
+    "Name": "Текст песни отображается"
+  }
+}

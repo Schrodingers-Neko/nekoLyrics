@@ -1,0 +1,22 @@
+{
+  "Localization": {
+    "No lyrics yet": "No hay letra disponible",
+    "Song": "Letra correspondiente",
+    "Split": "Arcoíris",
+    "Center": "Personalizar",
+    "Color Mode": "Modo de color",
+    "Double Line": "Doble línea",
+    "Single Line": "Una línea",
+    "Display Mode": "Modo de visualización",
+    "Text Color": "Color del texto",
+    "Lyric Offset": "Desfase de tiempo de la letra",
+    "Fade Mode": "Modo de degradado"
+  },
+  "Name": "letra",
+  "Description": "letra",
+  "Category": "letra",
+  "com.neko.nekoLyrics.sdPlugin": {
+    "Tooltip": "letra",
+    "Name": "la letra se muestra"
+  }
+}

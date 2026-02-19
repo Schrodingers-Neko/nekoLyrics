@@ -1,0 +1,22 @@
+{
+  "Localization": {
+    "No lyrics yet": "لا توجد كلمات للأغاني حاليًا",
+    "Song": "كلمات الأغاني المقابلة",
+    "Split": "قوس قزح",
+    "Center": "تخصيص",
+    "Color Mode": "وضع الألوان",
+    "Double Line": "سطرين",
+    "Single Line": "سطر واحد",
+    "Display Mode": "وضع العرض",
+    "Text Color": "لون النص",
+    "Lyric Offset": "انحراف وقت الكلمات",
+    "Fade Mode": "وضعية التدرج"
+  },
+  "Name": "كلمات الأغاني",
+  "Description": "كلمات الأغاني",
+  "Category": "كلمات الأغاني",
+  "com.neko.nekoLyrics.sdPlugin": {
+    "Tooltip": "كلمات الأغاني",
+    "Name": "显示歌词"
+  }
+}

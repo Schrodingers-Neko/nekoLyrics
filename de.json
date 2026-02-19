@@ -1,0 +1,22 @@
+{
+  "Localization": {
+    "No lyrics yet": "Keine Lyrics verfügbar",
+    "Song": "Entsprechende Lyrics",
+    "Split": "Regenbogen",
+    "Center": "Benutzerdefiniert",
+    "Color Mode": "Farbenmodus",
+    "Double Line": "Doppelte Zeile",
+    "Single Line": "Einzelne Zeile",
+    "Display Mode": "Anzeigemodus",
+    "Text Color": "Textfarbe",
+    "Lyric Offset": "Zeitverschiebung der Lyrics",
+    "Fade Mode": "Verlaufsmodus"
+  },
+  "Name": "texte",
+  "Description": "texte",
+  "Category": "texte",
+  "com.neko.nekoLyrics.sdPlugin": {
+    "Tooltip": "texte",
+    "Name": "Die Texte zeigen"
+  }
+}

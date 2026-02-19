@@ -1,0 +1,22 @@
+{
+  "Localization": {
+    "No lyrics yet": "No lyrics currently",
+    "Song": "Corresponding lyrics",
+    "Split": "Rainbow",
+    "Center": "Custom",
+    "Color Mode": "Color mode",
+    "Double Line": "Double line",
+    "Single Line": "Single line",
+    "Display Mode": "Display mode",
+    "Text Color": "Text color",
+    "Lyric Offset": "Lyrics time offset",
+    "Fade Mode": "Gradient mode"
+  },
+  "Name": "lyrics",
+  "Description": "lyrics",
+  "Category": "lyrics",
+  "com.neko.nekoLyrics.sdPlugin": {
+    "Tooltip": "lyrics",
+    "Name": "The lyrics show"
+  }
+}

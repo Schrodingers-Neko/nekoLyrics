@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Lyrics Controller - Property Inspector</title>
+    <link href="../utils/bootstrap.min.css" rel="stylesheet" />
+    <link href="../utils/bootstrap-icons.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="sdpi-wrapper p-3">
+        <div class="mb-3">
+            <label class="form-label">Song</label>
+            <select class="form-select" id="songmid"></select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Text Color</label>
+            <input type="color" class="form-control form-control-color w-100" id="textColor" value="#FFFFFF" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">@@Font Family</label>
+            <select class="form-select" id="fontFamily">
+                <option value="Arial">@@Arial</option>
+                <option value="PingFang SC">@@PingFang SC</option>
+                <option value="Microsoft YaHei">@@Microsoft YaHei</option>
+                <option value="Segoe UI">@@Segoe UI</option>
+                <option value="Courier New">@@Courier New</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Display Mode</label>
+            <select class="form-select" id="displayMode">
+                <option value="single">Single Line</option>
+                <option value="double">Double Line</option>
+                <option value="fade">Fade Mode</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Color Mode</label>
+            <select class="form-select" id="colorMode">
+                <option value="center">Center</option>
+                <option value="split">Split</option>
+            </select>
+        </div>
+        <label class="form-label">Lyric Offset</label>
+        <div class="mb-3 offset-container">
+            <button class="btn btn-outline-primary" onclick="adjustOffset(-0.1)">@@←</button>
+            <input type="number" class="form-control offset-input" id="offsetValue" value="0.0" step="0.1"
+                onchange="updateOffset()" />
+            <button class="btn btn-outline-primary" onclick="adjustOffset(0.1)">@@→</button>
+        </div>
+    </div>
+
+    <script src="../utils/common.js"></script>
+    <script src="../utils/action.js"></script>
+    <script src="../utils/axios.js"></script>
+    <script src="index.js"></script>
+</body>
+
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        padding: 8px;
+        background-color: #2a2a2a;
+        color: #fff;
+    }
+
+    ::-webkit-scrollbar {
+        width: 0;
+    }
+
+    ::-webkit-scrollbar-track {
+        border-radius: 8px;
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        border-radius: 8px;
+        background-color: #6d6d71;
+        outline: 1px solid slategrey;
+    }
+
+    .offset-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .form-select,
+    .form-control,
+    .btn {
+        background-color: #3a3a3a;
+        border-color: #4a4a4a;
+        color: #fff;
+    }
+
+    .form-select:focus,
+    .form-control:focus {
+        background-color: #3a3a3a;
+        border-color: #666;
+        color: #fff;
+        box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.1);
+    }
+
+    .form-label {
+        color: #ddd;
+        margin-bottom: 0.5rem;
+    }
+
+    .text-muted {
+        color: rgba(255, 255, 255, 0.5) !important;
+        font-size: 0.8rem;
+    }
+
+    .text-muted .bi {
+        color: rgba(255, 255, 255, 0.5);
+    }
+</style>
+
+</html>
