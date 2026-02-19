@@ -27,7 +27,7 @@ function getSystemFonts(callback) {
     });
 }
 
-plugin.nekoLyrics = new Actions({
+plugin.nekolyrics = new Actions({
     default: {}, async _willAppear({context}) {
         if (SongInfoGetter === null) {
             initSongInfoGetter();
@@ -37,7 +37,7 @@ plugin.nekoLyrics = new Actions({
         }
         currentAction[context] = new NekoLyrics(context);
     }, _willDisappear({context}) {
-        log.info("willDisAppear", context);
+        log.info("willDisappear", context);
         delete currentAction[context];
         if (Object.keys(currentAction).length === 0) {
             if (SongInfoGetter) {
@@ -627,7 +627,7 @@ class NekoLyrics {
     }
 
     didReceiveSettings({payload}) {
-        const data = plugin.nekoLyrics.data[this.context] || {};
+        const data = plugin.nekolyrics.data[this.context] || {};
         const touchbarWidth = data.touchbarWidth || 142;
         if (touchbarWidth !== this.cs.width) {
             this.cs.width = touchbarWidth;
@@ -641,7 +641,7 @@ class NekoLyrics {
     }
 
     async drawText(context, text1, text2) {
-        const data = plugin.nekoLyrics.data[context] || {};
+        const data = plugin.nekolyrics.data[context] || {};
         const touchbarWidth = data.touchbarWidth || 142;
         if (touchbarWidth !== this.cs.width) {
             this.cs.width = touchbarWidth;
@@ -776,9 +776,9 @@ class NekoLyrics {
                                     this.track.lyrics = lyricsResult;
                                     this.track.cover = candidate.cover;
                                     
-                                    plugin.nekoLyrics.data[this.context].list = candidates;
-                                    plugin.nekoLyrics.data[this.context].songmid = this.selectsongmid;
-                                    plugin.setSettings(this.context, plugin.nekoLyrics.data[this.context]);
+                                    plugin.nekolyrics.data[this.context].list = candidates;
+                                    plugin.nekolyrics.data[this.context].songmid = this.selectsongmid;
+                                    plugin.setSettings(this.context, plugin.nekolyrics.data[this.context]);
                                     
                                     SongStorage.setSongLyrics(snapshot, this.track.lyrics);
                                     foundValid = true;
@@ -815,11 +815,11 @@ class NekoLyrics {
                 }
 
                 this.currentsongmid = this.selectsongmid;
-                const match = plugin.nekoLyrics.data[this.context].list?.find(s => s.songmid === this.selectsongmid);
+                const match = plugin.nekolyrics.data[this.context].list?.find(s => s.songmid === this.selectsongmid);
                 const source = match?.source || "qqmusic";
                 
                 log.info("Manual selection fetch:", this.selectsongmid);
-                let lyricsResult = null;
+                let lyricsResult;
                 if (source === "lrclib" && match?.syncedLyrics) {
                     lyricsResult = { lyrics: match.syncedLyrics };
                 } else {

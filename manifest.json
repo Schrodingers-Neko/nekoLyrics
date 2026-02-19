@@ -2,7 +2,7 @@
   "Actions": [
     {
       "Icon": "static/icon.png",
-      "Name": "歌词显示",
+      "Name": "歌词显示喵",
       "DisableAutomaticStates": true,
       "States": [
         {
@@ -20,21 +20,21 @@
       "UserTitleEnabled": true,
       "SupportedInMultiActions": true,
       "Tooltip": "lyrics",
-      "UUID": "com.neko.nekoLyrics.sdPlugin",
+      "UUID": "com.neko.nekolyrics",
       "PropertyInspectorPath": "propertyInspector/lyrics/index.html"
     }
   ],
   "SDKVersion": 1,
-  "Author": "Neko",
-  "Name": "lyrics",
+  "Author": "nekonekoneko",
+  "Name": "neko-lyrics",
   "Icon": "static/icon.png",
   "CodePathWin": "plugin/main.js",
   "CodePathMac": "plugin/main.js",
-  "Description": "lyrics",
+  "Description": "lyrics nya",
   "Category": "lyrics",
   "CategoryIcon": "static/icon.png",
   "Version": "1.0.260205",
-  "URL": "https://github.com/neko/nekoLyrics",
+  "URL": "https://mirabox.key123.vip/home",
   "OS": [
     {
       "Platform": "mac",
