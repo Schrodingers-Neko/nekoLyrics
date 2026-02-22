@@ -1,16 +1,54 @@
-const bundle = require("./index.js");
-const __nccwpck_require__ = bundle;
-
-const {Plugins, Actions, log} = __nccwpck_require__(895);
-const {spawn, exec} = __nccwpck_require__(5317);
+const {spawn, exec} = require("child_process");
+const axios = require("axios");
 const {SongStorage} = require("./SongStorage.js");
+
+const {Plugins, Actions, log} = require("./utils/plugin.js");
+const path = require("path");
 
 const platform = process.platform;
 const plugin = new Plugins();
 const currentAction = {};
 let SongInfoGetter = null;
-
 let cachedFonts = null;
+
+SongStorage.initSongStorage();
+
+plugin.nekolyrics = new Actions({
+    default: {},
+    async _willAppear({context}) {
+        if (SongInfoGetter === null) {
+            initSongInfoGetter();
+        }
+        if (context in currentAction) {
+            return;
+        }
+        currentAction[context] = new NekoLyrics(context);
+    },
+    _willDisappear({context}) {
+        log.info("willDisappear", context);
+        delete currentAction[context];
+        if (Object.keys(currentAction).length === 0) {
+            if (SongInfoGetter) {
+                SongInfoGetter.kill("SIGINT");
+                SongInfoGetter = null;
+            }
+        }
+    },
+    _propertyInspectorDidAppear() {
+        getSystemFonts((fonts) => {
+            plugin.sendToPropertyInspector({
+                event: "getFonts",
+                fonts: fonts
+            });
+        });
+    },
+    async sendToPlugin({payload, context}) {
+        currentAction[context].sendToPlugin({payload});
+    },
+    _didReceiveSettings({payload, context}) {
+        currentAction[context].didReceiveSettings({payload});
+    }
+});
 
 function getSystemFonts(callback) {
     if (cachedFonts) return callback(cachedFonts);
@@ -27,38 +65,6 @@ function getSystemFonts(callback) {
         callback(cachedFonts);
     });
 }
-
-plugin.nekolyrics = new Actions({
-    default: {}, async _willAppear({context}) {
-        if (SongInfoGetter === null) {
-            initSongInfoGetter();
-        }
-        if (context in currentAction) {
-            return;
-        }
-        currentAction[context] = new NekoLyrics(context);
-    }, _willDisappear({context}) {
-        log.info("willDisappear", context);
-        delete currentAction[context];
-        if (Object.keys(currentAction).length === 0) {
-            if (SongInfoGetter) {
-                SongInfoGetter.kill("SIGINT");
-                SongInfoGetter = null;
-            }
-        }
-    }, _propertyInspectorDidAppear() {
-        getSystemFonts((fonts) => {
-            plugin.sendToPropertyInspector({
-                event: "getFonts",
-                fonts: fonts
-            });
-        });
-    }, async sendToPlugin({payload, context}) {
-        currentAction[context].sendToPlugin({payload});
-    }, _didReceiveSettings({payload, context}) {
-        currentAction[context].didReceiveSettings({payload});
-    }
-});
 
 function escapeXml(unsafe) {
     if (!unsafe) return "";
@@ -227,26 +233,22 @@ class LyricsAnimator {
         const a = this.height * 0.8;
         let r = `<g transform="rotate(${t}, ${i}, ${s})">
                 <text x="0" y="${o}" font-family="${this.fontFamily}" font-weight="bold" font-size="${Math.floor(24 * this.fact[0])}"
-                    fill="${this.color}" text-anchor="start"
-                    stroke="black" stroke-width="2">
+                    fill="${this.color}" text-anchor="start" stroke="black" stroke-width="2">
                     ${escapeXml(this.lines[0])}
                 </text>
                 <text x="${this.width}" y="${a}" font-family="${this.fontFamily}" font-weight="bold" font-size="${Math.floor(24 * this.fact[1])}"
-                    fill="${this.color}" text-anchor="end"
-                    stroke="black" stroke-width="2">
+                    fill="${this.color}" text-anchor="end" stroke="black" stroke-width="2">
                     ${escapeXml(this.lines[1])}
                 </text>
             </g>`;
         if (e < 0.99) {
             r += `<g transform="rotate(${n}, ${i}, ${s})">
             <text x="${-this.width / 2 * this.process}" y="${o}" font-family="${this.fontFamily}" font-weight="bold" font-size="${Math.floor(24 * this.fact[2])}"
-                fill="${this.color}" text-anchor="start"
-                stroke="black" stroke-width="2">
+                fill="${this.color}" text-anchor="start" stroke="black" stroke-width="2">
                 ${escapeXml(this.lines[2])}
             </text>
             <text x="${this.width + this.width / 2 * this.process}" y="${a}" font-family="${this.fontFamily}" font-weight="bold" font-size="${Math.floor(24 * this.fact[3])}"
-                fill="${this.color}" text-anchor="end"
-                stroke="black" stroke-width="2">
+                fill="${this.color}" text-anchor="end" stroke="black" stroke-width="2">
                 ${escapeXml(this.lines[3])}
             </text>
             </g>`;
@@ -272,16 +274,9 @@ class LyricsAnimator {
     svgText(text, color, x, y, size, opacity) {
         const escapedText = escapeXml(text);
         return `<text 
-            x="${x}"
-            y="${y}"
-            font-family="${this.fontFamily}"
-            font-weight="bold"
-            font-size="${size}"
-            fill="${color}"
-            text-anchor="middle"
-            opacity="${opacity}"
-            stroke="black"
-            stroke-width="2"
+            x="${x}" y="${y}" font-family="${this.fontFamily}" font-weight="bold"
+            font-size="${size}" fill="${color}" text-anchor="middle"
+            opacity="${opacity}" stroke="black" stroke-width="2"
         >${escapedText}</text>`;
     }
 }
@@ -291,7 +286,12 @@ function hsvToRgb(e, t, n) {
     let s = i * (1 - Math.abs(e * 6 % 2 - 1));
     let o = n - i;
     let a;
-    if (0 <= e && e < 1 / 6) a = [i, s, 0]; else if (1 / 6 <= e && e < 2 / 6) a = [s, i, 0]; else if (2 / 6 <= e && e < 3 / 6) a = [0, i, s]; else if (3 / 6 <= e && e < 4 / 6) a = [0, s, i]; else if (4 / 6 <= e && e < 5 / 6) a = [s, 0, i]; else a = [i, 0, s];
+    if (0 <= e && e < 1 / 6) a = [i, s, 0];
+    else if (1 / 6 <= e && e < 2 / 6) a = [s, i, 0];
+    else if (2 / 6 <= e && e < 3 / 6) a = [0, i, s];
+    else if (3 / 6 <= e && e < 4 / 6) a = [0, s, i];
+    else if (4 / 6 <= e && e < 5 / 6) a = [s, 0, i];
+    else a = [i, 0, s];
     return a.map((val => Math.floor((val + o) * 255)));
 }
 
@@ -362,8 +362,6 @@ const MetadataCleaner = {
         return costs[s2.length];
     }
 };
-
-const axios = __nccwpck_require__(7977);
 
 const HybridSearch = {
     async search(author, title, album, actualDuration) {
@@ -536,12 +534,6 @@ const HybridSearch = {
         }
     },
 
-    /**
-     * Unified method to fetch lyrics from any source
-     * @param {string} source - 'netease', 'qqmusic', or 'lrclib'
-     * @param {string|number} songmid - The source-specific ID
-     * @returns {Promise<{lyrics: string}|null>}
-     */
     async getLyric(source, songmid) {
         switch (source) {
             case "netease":
@@ -549,8 +541,6 @@ const HybridSearch = {
             case "qqmusic":
                 return await this.fetchQQLyric(songmid);
             case "lrclib":
-                // For LRCLIB, we usually have lyrics from the search,
-                // but if we need to fetch specifically by ID:
                 try {
                     const res = await axios.get(`https://lrclib.net/api/get/${songmid}`);
                     return {lyrics: res.data.syncedLyrics || res.data.plainLyrics};
@@ -565,9 +555,7 @@ const HybridSearch = {
     async fetchNeteaseLyric(songId) {
         try {
             const url = `https://music.163.com/api/song/media?id=${songId}`;
-            const response = await axios.get(url, {
-                headers: {Referer: "https://music.163.com"}
-            });
+            const response = await axios.get(url, {headers: {Referer: "https://music.163.com"}});
             return {lyrics: response.data.lyric};
         } catch (error) {
             log.error("Fetch Netease lyric error:", error);
@@ -586,58 +574,21 @@ const HybridSearch = {
     }
 };
 
-/**
- * @typedef {Object} TrackState
- * @property {number} starttime
- * @property {string} author
- * @property {string} name
- * @property {string} title
- * @property {string} album
- * @property {number} duration
- * @property {string|null} cover
- * @property {Object|null} lyrics
- * @property {number} startelapsed
- * @property {number} playbackRate
- * @property {boolean} hassongchange
- * @property {string} appName
- * @property {number} offsettime
- * @property {string} bundleIdentifier
- */
-
 class NekoLyrics {
-    /**
-     * @param {string} context
-     */
     constructor(context) {
         this.context = context;
-        this.cs = {
-            width: 0,
-            text1: "",
-            text2: "",
-            lyricsAnimator: null
-        };
+        this.cs = {width: 0, text1: "", text2: "", lyricsAnimator: null};
         this.isDrawing = false;
-        /** @type {TrackState} */
         this.track = {
-            starttime: 0,
-            author: "",
-            name: "",
-            title: "",
-            album: "",
-            duration: 0,
-            cover: null,
-            lyrics: null,
-            startelapsed: 0,
-            playbackRate: 0,
-            hassongchange: false,
-            appName: "",
-            offsettime: 0,
-            bundleIdentifier: ""
+            starttime: 0, author: "", name: "", title: "", album: "",
+            duration: 0, cover: null, lyrics: null, startelapsed: 0,
+            playbackRate: 0, hassongchange: false, appName: "",
+            offsettime: 0, bundleIdentifier: ""
         };
         this.lastSearchTime = 0;
         this.selectsongmid = "";
         this.currentsongmid = "";
-        this.globalOffset = 500; // to account for display latency
+        this.globalOffset = 500;
 
         log.info("_willAppear: ", context);
         if (this.timers !== undefined) clearInterval(this.timers);
@@ -719,19 +670,14 @@ class NekoLyrics {
 
             if (this.track.name !== "" && this.track.hassongchange) {
                 const snapshot = {
-                    name: this.track.name,
-                    author: this.track.author,
-                    title: this.track.title,
-                    album: this.track.album,
-                    duration: this.track.duration,
-                    bundleIdentifier: this.track.bundleIdentifier
+                    name: this.track.name, author: this.track.author,
+                    title: this.track.title, album: this.track.album,
+                    duration: this.track.duration, bundleIdentifier: this.track.bundleIdentifier
                 };
 
                 this.cs.text1 = "";
                 this.cs.text2 = "";
-                if (this.cs.lyricsAnimator) {
-                    this.cs.lyricsAnimator.lines = ["", "", "", ""];
-                }
+                if (this.cs.lyricsAnimator) this.cs.lyricsAnimator.lines = ["", "", "", ""];
 
                 if (MetadataCleaner.isInstrumental(this.track.name) || MetadataCleaner.isInstrumental(this.track.title)) {
                     log.info("Instrumental detected, skipping search:", this.track.name);
@@ -829,9 +775,7 @@ class NekoLyrics {
 
                 this.cs.text1 = "";
                 this.cs.text2 = "";
-                if (this.cs.lyricsAnimator) {
-                    this.cs.lyricsAnimator.lines = ["", "", "", ""];
-                }
+                if (this.cs.lyricsAnimator) this.cs.lyricsAnimator.lines = ["", "", "", ""];
 
                 this.currentsongmid = this.selectsongmid;
                 const match = plugin.nekolyrics.data[this.context].list?.find(s => s.songmid === this.selectsongmid);
@@ -922,7 +866,8 @@ function initSongInfoGetter() {
     if (platform === "darwin") {
         SongInfoGetter = spawn("/usr/bin/perl", [__dirname + "/bin/mediaremote-adapter.pl", __dirname + "/build/MediaRemoteAdapter.framework", "stream", "--no-diff", "--debounce=1000"]);
     } else if (platform === "win32") {
-        SongInfoGetter = spawn(__dirname + "/bin/MediaBridge.exe");
+        const exePath = path.join(...[__dirname, "bin", "MediaBridge.exe"]);
+        SongInfoGetter = spawn(exePath);
     }
 
     if (SongInfoGetter) {

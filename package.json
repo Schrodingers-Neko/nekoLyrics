@@ -5,10 +5,18 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "package:sdplugin": "node build.js"
+    "build:ncc": "ncc build plugin/main.js -o plugin/dist -m",
+    "package:build": "node build.js",
+    "package:sdplugin": "npm run build:ncc && node build.js"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "globals": "^17.3.0"
+    "globals": "^17.3.0",
+    "@vercel/ncc": "^0.38.4"
+  },
+  "dependencies": {
+    "axios": "^1.13.5",
+    "log4js": "^6.9.1",
+    "ws": "^8.19.0"
   }
 }
