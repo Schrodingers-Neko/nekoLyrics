@@ -8,6 +8,7 @@ The Windows bridge is written in C++, while macOS utilizes a Perl-based bridge f
 - [ ] Localizations
   - [x] zh_CN
   - [ ] remaining languages
+- [ ] Mark track as instrumental and cache
 - [x] Meow
 
 ## Build:

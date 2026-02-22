@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
-const dir = "./LyricsCache";
+const dir = "./cache";
 
 function getMd5(data) {
     var md5 = crypto.createHash("md5");
@@ -33,9 +33,7 @@ class LyricsCache {
                 return null;
             }
             const parsed = JSON.parse(data);
-            // Check for either 'lyrics' or the old 'lyric' property for backward compatibility
-            if (!parsed.lyrics && !parsed.lyric) return null;
-            return parsed;
+            return parsed.lyrics === null ? null : parsed;
         } catch (_e) {
             if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
             return null;
@@ -43,15 +41,7 @@ class LyricsCache {
     }
 
     static setSongLyrics(song, lyrics) {
-        // Validation: handle both new 'lyrics' and legacy 'lyric' property
-        const lyricsText = lyrics?.lyrics || lyrics?.lyric;
-        if (!lyricsText || lyricsText.trim() === "") {
-            return; // Don't cache empty results
-        }
-        
-        // Normalize to the new 'lyrics' property before saving
-        const dataToSave = { lyrics: lyricsText };
-        
+        const dataToSave = {"lyrics": lyrics?.lyrics?.trim() ?? "null"}; // cache empty results
         const filePath = getfilePath(song);
         const data = JSON.stringify(dataToSave);
         fs.writeFileSync(filePath, data);
