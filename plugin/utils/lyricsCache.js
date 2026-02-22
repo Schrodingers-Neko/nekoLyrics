@@ -1,20 +1,20 @@
 const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
-const dir = "./SongStorage";
+const dir = "./LyricsCache";
 
 function getMd5(data) {
     var md5 = crypto.createHash("md5");
     return md5.update(data).digest("hex");
 }
 
-function getSongFile(song) {
+function getfilePath(song) {
     // Ensuring we use consistent properties for the hash
     return path.join(dir, getMd5(song.name + song.author + (song.bundleIdentifier || "")));
 }
 
-class SongStorage {
-    static initSongStorage() {
+class LyricsCache {
+    static init() {
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir);
         }
@@ -22,14 +22,14 @@ class SongStorage {
 
     static getSongLyrics(song) {
         if (!song.name) return null;
-        const songfile = getSongFile(song);
-        if (!fs.existsSync(songfile)) {
+        const filePath = getfilePath(song);
+        if (!fs.existsSync(filePath)) {
             return null;
         }
         try {
-            const data = fs.readFileSync(songfile, "utf8");
+            const data = fs.readFileSync(filePath, "utf8");
             if (!data || data.trim() === "{}" || data.trim() === "") {
-                fs.unlinkSync(songfile); // Delete empty/corrupt cache
+                fs.unlinkSync(filePath); // Delete empty/corrupt cache
                 return null;
             }
             const parsed = JSON.parse(data);
@@ -37,7 +37,7 @@ class SongStorage {
             if (!parsed.lyrics && !parsed.lyric) return null;
             return parsed;
         } catch (_e) {
-            if (fs.existsSync(songfile)) fs.unlinkSync(songfile);
+            if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
             return null;
         }
     }
@@ -52,18 +52,18 @@ class SongStorage {
         // Normalize to the new 'lyrics' property before saving
         const dataToSave = { lyrics: lyricsText };
         
-        const songfile = getSongFile(song);
+        const filePath = getfilePath(song);
         const data = JSON.stringify(dataToSave);
-        fs.writeFileSync(songfile, data);
+        fs.writeFileSync(filePath, data);
     }
 
     static getSongLyricsOffset(song) {
-        const songfile = getSongFile(song) + ".offset";
-        if (!fs.existsSync(songfile)) {
+        const filePath = getfilePath(song) + ".offset";
+        if (!fs.existsSync(filePath)) {
             return null;
         }
         try {
-            const data = fs.readFileSync(songfile, "utf8");
+            const data = fs.readFileSync(filePath, "utf8");
             return parseInt(data);
         } catch (_e) {
             return null;
@@ -71,11 +71,11 @@ class SongStorage {
     }
 
     static setSongLyricsOffset(song, offset) {
-        const songfile = getSongFile(song) + ".offset";
-        fs.writeFileSync(songfile, offset.toString());
+        const filePath = getfilePath(song) + ".offset";
+        fs.writeFileSync(filePath, offset.toString());
     }
 }
 
 module.exports = {
-    SongStorage
+    lyricsCache: LyricsCache
 };
