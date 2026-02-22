@@ -11,12 +11,13 @@ const currentAction = {};
 let SongInfoGetter = null;
 
 let cachedFonts = null;
+
 function getSystemFonts(callback) {
     if (cachedFonts) return callback(cachedFonts);
     if (platform !== "win32") return callback(["Arial", "Helvetica", "PingFang SC"]);
 
     const cmd = "powershell -NoProfile -Command \"$OutputEncoding = [Console]::OutputEncoding = [System.Text.Encoding]::UTF8; Add-Type -AssemblyName System.Drawing; [System.Drawing.Text.InstalledFontCollection]::new().Families.Name\"";
-    exec(cmd, { encoding: "utf8", maxBuffer: 1024 * 1024 }, (err, stdout) => {
+    exec(cmd, {encoding: "utf8", maxBuffer: 1024 * 1024}, (err, stdout) => {
         if (err) {
             log.error("Font fetch error: " + err.message);
             return callback(["Arial"]);
@@ -63,12 +64,18 @@ function escapeXml(unsafe) {
     if (!unsafe) return "";
     return unsafe.replace(/[<>&"']/g, function (c) {
         switch (c) {
-            case "<": return "&lt;";
-            case ">": return "&gt;";
-            case "&": return "&amp;";
-            case "\"": return "&quot;";
-            case "'": return "&apos;";
-            default: return c;
+            case "<":
+                return "&lt;";
+            case ">":
+                return "&gt;";
+            case "&":
+                return "&amp;";
+            case "\"":
+                return "&quot;";
+            case "'":
+                return "&apos;";
+            default:
+                return c;
         }
     });
 }
@@ -320,11 +327,11 @@ const MetadataCleaner = {
     isInstrumental(text) {
         if (!text) return false;
         const lower = text.toLowerCase();
-        return lower.includes("伴奏") || 
-               lower.includes("instrumental") || 
-               lower.includes("piano version") ||
-               lower.includes("karaoke") ||
-               lower.includes("backing track");
+        return lower.includes("伴奏") ||
+            lower.includes("instrumental") ||
+            lower.includes("piano version") ||
+            lower.includes("karaoke") ||
+            lower.includes("backing track");
     },
     similarity(s1, s2) {
         if (!s1 || !s2) return 0;
@@ -364,7 +371,7 @@ const HybridSearch = {
         const cleanAuthor = MetadataCleaner.clean(author || "");
         const cleanAlbum = MetadataCleaner.clean(album || "");
         const query = `${cleanTitle} ${cleanAuthor}`;
-        
+
         log.info(`Hybrid Search: "${query}" (Target: ${Math.floor(actualDuration)}s)`);
 
         const results = await Promise.allSettled([
@@ -403,7 +410,7 @@ const HybridSearch = {
             const resTitleLow = item.songname.toLowerCase();
             const titleSim = MetadataCleaner.similarity(cleanTitle, item.songname);
             const titleContains = resTitleLow.includes(titleLower) || titleLower.includes(resTitleLow);
-            
+
             if (!titleContains && titleSim < 0.5) {
                 score -= 100;
             } else {
@@ -416,9 +423,9 @@ const HybridSearch = {
                 const sLow = s.toLowerCase();
                 return sLow.includes(authorLow) || authorLow.includes(sLow);
             });
-            
+
             if (!artistContains && artistSim < 0.4) {
-                score -= 100; 
+                score -= 100;
             } else {
                 score += (artistSim * 30) + (artistContains ? 10 : 0);
             }
@@ -431,29 +438,30 @@ const HybridSearch = {
                 }
             }
 
-            if (item.source === "lrclib") score += 10; 
-            else if (item.source === "netease") score += 5; 
+            if (item.source === "lrclib") score += 30;
+            else if (item.source === "netease") score += 5;
 
             item.score = score;
         });
 
         pool.sort((a, b) => b.score - a.score);
-        
-        const threshold = 60;
-        if (pool[0].score < threshold) {
+
+        const threshold = 80;
+        const filteredPool = pool.filter(item => item.score >= threshold);
+
+        if (filteredPool.length === 0) {
             log.warn(`Best match rejected: ${pool[0].songname} (Score: ${Math.floor(pool[0].score)} < ${threshold})`);
             return null;
         }
 
-        log.info(`Best match: ${pool[0].songname} by ${pool[0].singer[0]} (${pool[0].source}) score: ${Math.floor(pool[0].score)}`);
-        return pool;
+        return filteredPool;
     },
 
     async searchNetease(query) {
         try {
             const res = await axios.get("https://music.163.com/api/search/get/web", {
-                params: { s: query, type: 1, limit: 5 },
-                headers: { Referer: "https://music.163.com" }
+                params: {s: query, type: 1, limit: 5},
+                headers: {Referer: "https://music.163.com"}
             });
             return (res.data.result?.songs || []).map(s => ({
                 songmid: s.id,
@@ -463,14 +471,16 @@ const HybridSearch = {
                 cover: s.album?.picUrl || null,
                 source: "netease"
             }));
-        } catch (_e) { return []; }
+        } catch (_e) {
+            return [];
+        }
     },
 
     async searchQQ(query) {
         try {
             const res = await axios.get("https://c.y.qq.com/soso/fcgi-bin/client_search_cp", {
-                params: { format: "json", n: 5, w: query, cr: 1, g_tk: 5381, t: 0 },
-                headers: { Referer: "https://y.qq.com" }
+                params: {format: "json", n: 5, w: query, cr: 1, g_tk: 5381, t: 0},
+                headers: {Referer: "https://y.qq.com"}
             });
             return (res.data.data?.song?.list || []).map(s => ({
                 songmid: s.songmid,
@@ -480,18 +490,20 @@ const HybridSearch = {
                 cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${s.albummid}.jpg`,
                 source: "qqmusic"
             }));
-        } catch (_e) { return []; }
+        } catch (_e) {
+            return [];
+        }
     },
 
     async searchLRCLIB(title, artist, album, duration) {
         try {
             try {
                 const getRes = await axios.get("https://lrclib.net/api/get", {
-                    params: { 
-                        track_name: title, 
-                        artist_name: artist, 
-                        album_name: album, 
-                        duration: Math.round(duration) 
+                    params: {
+                        track_name: title,
+                        artist_name: artist,
+                        album_name: album,
+                        duration: Math.round(duration)
                     }
                 });
                 if (getRes.data) {
@@ -505,10 +517,11 @@ const HybridSearch = {
                         syncedLyrics: getRes.data.syncedLyrics || getRes.data.plainLyrics
                     }];
                 }
-            } catch (_e) { /* ignore 404 */ }
+            } catch (_e) { /* ignore 404 */
+            }
 
             const searchRes = await axios.get("https://lrclib.net/api/search", {
-                params: { track_name: title, artist_name: artist }
+                params: {track_name: title, artist_name: artist}
             });
             return (searchRes.data || []).map(s => ({
                 songmid: s.id,
@@ -518,7 +531,9 @@ const HybridSearch = {
                 source: "lrclib",
                 syncedLyrics: s.syncedLyrics || s.plainLyrics
             }));
-        } catch (_e) { return []; }
+        } catch (_e) {
+            return [];
+        }
     },
 
     /**
@@ -538,8 +553,10 @@ const HybridSearch = {
                 // but if we need to fetch specifically by ID:
                 try {
                     const res = await axios.get(`https://lrclib.net/api/get/${songmid}`);
-                    return { lyrics: res.data.syncedLyrics || res.data.plainLyrics };
-                } catch (_e) { return null; }
+                    return {lyrics: res.data.syncedLyrics || res.data.plainLyrics};
+                } catch (_e) {
+                    return null;
+                }
             default:
                 return await this.fetchQQLyric(songmid);
         }
@@ -549,9 +566,9 @@ const HybridSearch = {
         try {
             const url = `https://music.163.com/api/song/media?id=${songId}`;
             const response = await axios.get(url, {
-                headers: { Referer: "https://music.163.com" }
+                headers: {Referer: "https://music.163.com"}
             });
-            return { lyrics: response.data.lyric };
+            return {lyrics: response.data.lyric};
         } catch (error) {
             log.error("Fetch Netease lyric error:", error);
             return null;
@@ -561,7 +578,7 @@ const HybridSearch = {
     async fetchQQLyric(songmid) {
         try {
             const response = await axios.get(`https://api.vkeys.cn/v2/music/tencent/lyric?mid=${songmid}`);
-            return { lyrics: response.data.data.lrc };
+            return {lyrics: response.data.data.lrc};
         } catch (error) {
             log.error("Fetch QQ lyric error:", error);
             return null;
@@ -620,7 +637,8 @@ class NekoLyrics {
         this.lastSearchTime = 0;
         this.selectsongmid = "";
         this.currentsongmid = "";
-        
+        this.globalOffset = 500; // to account for display latency
+
         log.info("_willAppear: ", context);
         if (this.timers !== undefined) clearInterval(this.timers);
         this.timers = setInterval(this.draw.bind(this), 50);
@@ -649,20 +667,20 @@ class NekoLyrics {
             this.cs.text1 = "";
             this.cs.text2 = "";
         }
-        
+
         const animator = this.cs.lyricsAnimator;
         animator.color = data.color || "white";
         animator.colorMode = data.colorMode || "center";
         animator.fontFamily = data.fontFamily || "Arial";
         animator.setEffect(data.mode === "fade" ? 0 : data.mode === "double" ? 1 : 2);
-        
+
         if (this.cs.text1 !== text1 || this.cs.text2 !== text2) {
             if (this.cs.text2 !== text1) {
                 animator.addLine(text1);
             }
             animator.addLine(text2);
         }
-        
+
         this.cs.text1 = text1;
         this.cs.text2 = text2;
         const c = animator.getSvg();
@@ -670,7 +688,8 @@ class NekoLyrics {
     }
 
     getCurrentTime() {
-        return (new Date()).getTime() - this.track.starttime + this.track.startelapsed + this.track.offsettime;
+        return (new Date()).getTime() - this.track.starttime
+            + this.track.startelapsed + this.track.offsettime + this.globalOffset;
     }
 
     async sendToPlugin({payload}) {
@@ -707,7 +726,7 @@ class NekoLyrics {
                     duration: this.track.duration,
                     bundleIdentifier: this.track.bundleIdentifier
                 };
-                
+
                 this.cs.text1 = "";
                 this.cs.text2 = "";
                 if (this.cs.lyricsAnimator) {
@@ -746,7 +765,7 @@ class NekoLyrics {
                     this.lastSearchTime = now;
                     this.track.hassongchange = false;
                     const candidates = await HybridSearch.search(snapshot.author, snapshot.name, snapshot.album, snapshot.duration);
-                    
+
                     if (this.track.name !== snapshot.name || this.track.author !== snapshot.author) {
                         this.isDrawing = false;
                         return;
@@ -762,7 +781,7 @@ class NekoLyrics {
 
                             let lyricsResult = null;
                             if (candidate.source === "lrclib" && candidate.syncedLyrics) {
-                                lyricsResult = { lyrics: candidate.syncedLyrics };
+                                lyricsResult = {lyrics: candidate.syncedLyrics};
                             } else {
                                 lyricsResult = await HybridSearch.getLyric(candidate.source, candidate.songmid);
                             }
@@ -775,11 +794,11 @@ class NekoLyrics {
                                     this.currentsongmid = this.selectsongmid = candidate.songmid;
                                     this.track.lyrics = lyricsResult;
                                     this.track.cover = candidate.cover;
-                                    
+
                                     plugin.nekolyrics.data[this.context].list = candidates;
                                     plugin.nekolyrics.data[this.context].songmid = this.selectsongmid;
                                     plugin.setSettings(this.context, plugin.nekolyrics.data[this.context]);
-                                    
+
                                     SongStorage.setSongLyrics(snapshot, this.track.lyrics);
                                     foundValid = true;
                                     log.info(`Successfully loaded synced lyrics with ${lineCount} lines.`);
@@ -807,7 +826,7 @@ class NekoLyrics {
                     author: this.track.author,
                     bundleIdentifier: this.track.bundleIdentifier
                 };
-                
+
                 this.cs.text1 = "";
                 this.cs.text2 = "";
                 if (this.cs.lyricsAnimator) {
@@ -817,11 +836,11 @@ class NekoLyrics {
                 this.currentsongmid = this.selectsongmid;
                 const match = plugin.nekolyrics.data[this.context].list?.find(s => s.songmid === this.selectsongmid);
                 const source = match?.source || "qqmusic";
-                
+
                 log.info("Manual selection fetch:", this.selectsongmid);
                 let lyricsResult;
                 if (source === "lrclib" && match?.syncedLyrics) {
-                    lyricsResult = { lyrics: match.syncedLyrics };
+                    lyricsResult = {lyrics: match.syncedLyrics};
                 } else {
                     lyricsResult = await HybridSearch.getLyric(source, this.selectsongmid);
                 }
@@ -836,10 +855,11 @@ class NekoLyrics {
             }
 
             let {text1: o, text2: a} = getCurrentLyrics(this.track.lyrics, this.getCurrentTime());
-            
+
             if (!this.track.lyrics || o === "") {
-                const infoStr = `${this.track.author} - ${this.track.album} - ${this.track.title || this.track.name}`;
-                await this.drawText(this.context, infoStr, "");
+                const infoStr1 = `${this.track.author} - ${this.track.album}`;
+                const infoStr2 = `${this.track.title || this.track.name}`;
+                await this.drawText(this.context, infoStr1, infoStr2);
             } else {
                 await this.drawText(this.context, o, a);
             }
@@ -879,13 +899,13 @@ class NekoLyrics {
             this.track.duration = newDuration;
             this.track.cover = null;
             this.track.bundleIdentifier = newBundle;
-            
+
             this.cs.text1 = "";
             this.cs.text2 = "";
             if (this.cs.lyricsAnimator) {
                 this.cs.lyricsAnimator.lines = ["", "", "", ""];
             }
-            
+
             log.info("Metadata update:", searchName, "by", newArtist, `(${Math.floor(newDuration)}s)`);
         }
 
@@ -910,8 +930,8 @@ function initSongInfoGetter() {
         SongInfoGetter.stdout.on("data", (data) => {
             buffer += data;
             let lines = buffer.split(/\r?\n/);
-            buffer = lines.pop(); 
-            
+            buffer = lines.pop();
+
             for (let line of lines) {
                 if (!line.trim()) continue;
                 let t;
@@ -921,7 +941,7 @@ function initSongInfoGetter() {
                     log.error("JSON Parse Error:", err.message, "Line:", line);
                     continue;
                 }
-                
+
                 if (t.payload && t.payload.playbackRate !== undefined) {
                     for (let id in currentAction) {
                         currentAction[id].getSonginfo(t);
@@ -946,7 +966,7 @@ function getCurrentLyrics(lyricsData, t) {
     const lines = lyricsData.lyrics.split("\n");
     const timeRegex = /\[(\d{1,3}):(\d{2})(?:\.(\d{1,3}))?]/;
     const parsedLyrics = [];
-    
+
     for (let line of lines) {
         const match = timeRegex.exec(line);
         if (match) {
@@ -957,13 +977,13 @@ function getCurrentLyrics(lyricsData, t) {
             const totalMs = mins * 60000 + secs * 1000 + ms;
             const text = line.replace(/\[.*?]/g, "").trim();
             if (text) {
-                parsedLyrics.push({ time: totalMs, text });
+                parsedLyrics.push({time: totalMs, text});
             }
         }
     }
-    
+
     parsedLyrics.sort((a, b) => a.time - b.time);
-    
+
     let currentIdx = -1;
     for (let i = 0; i < parsedLyrics.length; i++) {
         if (parsedLyrics[i].time <= t) {
@@ -972,11 +992,11 @@ function getCurrentLyrics(lyricsData, t) {
             break;
         }
     }
-    
+
     if (currentIdx === -1) {
-        return { text1: "", text2: "" };
+        return {text1: "", text2: ""};
     }
-    
+
     return {
         text1: parsedLyrics[currentIdx].text,
         text2: (currentIdx + 1 < parsedLyrics.length) ? parsedLyrics[currentIdx + 1].text : ""

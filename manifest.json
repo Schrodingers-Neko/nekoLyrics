@@ -1,12 +1,12 @@
 {
   "Actions": [
     {
-      "Icon": "static/icon.png",
+      "Icon": "res/icon.png",
       "Name": "歌词显示喵",
       "DisableAutomaticStates": true,
       "States": [
         {
-          "Image": "static/large.png",
+          "Image": "res/large.png",
           "TitleAlignment": "center"
         }
       ],
@@ -27,12 +27,12 @@
   "SDKVersion": 1,
   "Author": "nekonekoneko",
   "Name": "neko-lyrics",
-  "Icon": "static/icon.png",
+  "Icon": "res/icon.png",
   "CodePathWin": "plugin/main.js",
   "CodePathMac": "plugin/main.js",
   "Description": "lyrics nya",
   "Category": "lyrics",
-  "CategoryIcon": "static/icon.png",
+  "CategoryIcon": "res/icon.png",
   "Version": "1.0.260205",
   "URL": "https://mirabox.key123.vip/home",
   "OS": [
