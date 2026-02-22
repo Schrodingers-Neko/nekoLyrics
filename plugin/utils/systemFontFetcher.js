@@ -13,7 +13,7 @@ function getSystemFonts(callback) {
 
     if (platform !== "win32") return callback(["Arial", "Helvetica", "PingFang SC"]);
 
-    const cmd = `powershell -NoProfile -Command "$OutputEncoding = [Console]::OutputEncoding = [System.Text.Encoding]::UTF8; Add-Type -AssemblyName System.Drawing; [System.Drawing.Text.InstalledFontCollection]::new().Families.Name"`;
+    const cmd = "powershell -NoProfile -Command \"$OutputEncoding = [Console]::OutputEncoding = [System.Text.Encoding]::UTF8; Add-Type -AssemblyName System.Drawing; [System.Drawing.Text.InstalledFontCollection]::new().Families.Name\"";
     exec(cmd, {encoding: "utf8", maxBuffer: 1024 * 1024}, (err, stdout) => {
         if (err) {
             log.error("Font fetch error: " + err.message);

@@ -8,7 +8,7 @@ function escapeXml(unsafe) {
                 return "&gt;";
             case "&":
                 return "&amp;";
-            case '"':
+            case "\"":
                 return "&quot;";
             case "'":
                 return "&apos;";

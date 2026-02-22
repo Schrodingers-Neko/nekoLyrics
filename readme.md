@@ -1,15 +1,18 @@
-# Stream Dock Documentation
+# com.neko.nekoLyrics
 
-For details, please see
+A high-performance, cross-platform lyrics display plugin for the Mirabox StreamDock (Models 293N4, N4 Pro, etc.) based on `com.hotspot.streamdock.maclyrics` with significant improvements and adaptations for the Windows platform. Written primarily in JavaScript for the core logic, it provides real-time, time-synced lyrics display.
 
-[https://sdk.key123.vip/guide/events-received.html](https://sdk.key123.vip/en/guide/events-received.html)
+The Windows bridge is written in C++, while macOS utilizes a Perl-based bridge for media sensing. 
 
-[https://sdk.key123.vip/guide/events-sent.html](https://sdk.key123.vip/en/guide/events-sent.html)
+### WIP:
+- [ ] Localizations
+  - [x] zh_CN
+  - [ ] remaining languages
+- [x] Meow
 
-## Precautions
+## Build:
 
-Windows: The software version needs to be `3.10.188.226` or above. Starting from `3.10.188.226`, the software has a built-in node module, and the built-in node version is `20.8.1`. Set Version in manifest to `20`. Other versions are not built-in yet. 
-
-Mac: `3.10.189.0313` is not built-in yet, and you need to wait for the next version
-
-[manifest#nodejs](https://sdk.key123.vip/en/guide/manifest.html#nodejs)
+```bash
+npm ci
+npm run package:plugin
+```

@@ -5,10 +5,9 @@ export default [
     js.configs.recommended,
     {
         ignores: [
-            "plugin/index.js",
-            "SongStorage/**",
             "node_modules/**",
             "windows-bridge-src/**",
+            "res/**",
             "dist/**",
             "build/**",
             "log/**",

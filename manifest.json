@@ -25,7 +25,7 @@
     }
   ],
   "SDKVersion": 1,
-  "Author": "nekonekoneko",
+  "Author": "Schrodingers-Neko",
   "Name": "neko-lyrics",
   "Icon": "res/icon.png",
   "CodePathWin": "plugin/index.js",
@@ -34,7 +34,7 @@
   "Category": "lyrics",
   "CategoryIcon": "res/icon.png",
   "Version": "1.0.260205",
-  "URL": "https://mirabox.key123.vip/home",
+  "URL": "https://github.com/Schrodingers-Neko/nekoLyrics",
   "OS": [
     {
       "Platform": "mac",
